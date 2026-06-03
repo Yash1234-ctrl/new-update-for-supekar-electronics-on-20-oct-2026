@@ -87,12 +87,8 @@ export default function AboutSection() {
             color: "#ddd",
           }}
         >
-          Supekar Electronics is a proposed electronics manufacturing venture
-          focused on automation, IoT, and smart control solutions. The company
-          is currently in the product development stage, with ready-to-launch
-          designs aimed at affordable, repairable, and locally manufactured
-          electronics. Our objective is to build a Made-in-India electronics
-          brand with strong distributor and service support.
+          Supekar Electronics is a registered Indian electronics manufacturing and technology company specializing in Electronics Design, IoT Solutions, Embedded Systems, Automation, PCB Design, PCB Manufacturing, and Product Development. The company develops innovative and reliable products for residential, industrial, and agricultural applications with a focus on smart automation and connected technologies.
+
         </motion.p>
       </motion.div>
     </section>

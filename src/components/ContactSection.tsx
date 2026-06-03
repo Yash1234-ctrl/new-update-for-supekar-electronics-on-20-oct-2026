@@ -5,10 +5,10 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { auth } from "@/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { FaEnvelope, FaWhatsapp, FaInstagram } from "react-icons/fa";
+import { FaEnvelope, FaWhatsapp, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import {
   inputStyle,
   buttonStyle,
@@ -37,6 +37,8 @@ export default function ContactSection() {
 
   // Contact info read from env so it can be changed per deployment
   const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "";
+  const founderEmail = "prathameshsupekar2804@gmail.com";
+  const linkedin = "https://www.linkedin.com/in/prathamesh-supekar-9a8037256";
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
   const insta = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "";
 
@@ -65,6 +67,9 @@ export default function ContactSection() {
 
     setSending(true);
     try {
+      const senderEmail = user?.email ?? "no-reply@example.com";
+      const recipientEmail = founderEmail || email || "prathameshsupekar2804@gmail.com";
+
       const response = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
@@ -73,7 +78,10 @@ export default function ContactSection() {
           name: data.name,
           mobile: data.mobile,
           message: data.requirement,
-          email: user?.email ?? "no-reply@example.com",
+          email: senderEmail,
+          reply_to: senderEmail,
+          to_email: recipientEmail,
+          sender_email: senderEmail,
         },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
       );
@@ -87,8 +95,7 @@ export default function ContactSection() {
       console.error("EmailJS ERROR:", error);
       if (error && error.status === 412) {
         toast.error(
-          `Email service configuration issue: ${
-            error.text || "please check your EmailJS dashboard"
+          `Email service configuration issue: ${error.text || "please check your EmailJS dashboard"
           }`
         );
       } else {
@@ -179,6 +186,14 @@ export default function ContactSection() {
             style={socialLinkStyle("#00c3ff")}
           >
             <FaEnvelope /> Email
+          </a>
+          <a
+            href={linkedin}
+            target="_blank"
+            rel="noreferrer"
+            style={socialLinkStyle("#0a66c2")}
+          >
+            <FaLinkedin /> LinkedIn
           </a>
           <a
             href={`https://wa.me/${whatsapp}?text=Hello%20Supekar%20Electronics`}

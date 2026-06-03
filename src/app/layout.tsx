@@ -1,6 +1,7 @@
 import "./globals.css";
 import "../sentry"; // initialize Sentry if DSN provided
 import { ReactNode } from "react";
+import CookieConsent from "../components/CookieConsent";
 
 export const metadata = {
   title: "Supekar Electronics",
@@ -16,7 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }
