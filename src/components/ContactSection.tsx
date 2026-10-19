@@ -1,309 +1,125 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import emailjs from "@emailjs/browser";
-import { auth } from "@/firebase";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { FaEnvelope, FaWhatsapp, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { useForm } from "react-hook-form";
-import { toast, ToastContainer } from "react-toastify";
+import { useEffect, useState, type FormEvent } from "react";
+import { Mail, Phone, MessageCircle } from "lucide-react";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { services, siteContact } from "../config/site";
 
-import {
-  inputStyle,
-  buttonStyle,
-  socialLinkStyle,
-} from "../styles";
+type FormStatus = { kind: "success" | "error"; message: string } | null;
 
 export default function ContactSection() {
-  // form state
-  const [user, setUser] = useState<User | null>(null);
   const [sending, setSending] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const shouldReduce = useReducedMotion();
+  const [status, setStatus] = useState<FormStatus>(null);
+  const [message, setMessage] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<{ name: string; mobile: string; requirement: string }>({
-    defaultValues: {
-      name: "",
-      mobile: "",
-      requirement: "",
-    },
-  });
-
-  // Contact info read from env so it can be changed per deployment
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "";
-  const founderEmail = "prathameshsupekar2804@gmail.com";
-  const linkedin = "https://www.linkedin.com/in/prathamesh-supekar-9a8037256";
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
-  const insta = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "";
-
-  // Prefill Name if logged in
   useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser?.displayName) {
-        reset({ name: currentUser.displayName });
-      }
-    });
-    return () => unsubscribe();
-  }, [reset]);
+    const product = new URLSearchParams(window.location.search).get("product");
+    if (product) setMessage(`I am interested in ${product}.`);
+  }, []);
 
-  // Send email using EmailJS
-  const sendEmail = async (data: {
-    name: string;
-    mobile: string;
-    requirement: string;
-  }) => {
-    if (!user) {
-      toast.error("Please login first.");
-      return;
-    }
-
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus(null);
     setSending(true);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
     try {
-      const senderEmail = user?.email ?? "no-reply@example.com";
-      const recipientEmail = founderEmail || email || "prathameshsupekar2804@gmail.com";
-
-      const response = await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        {
-          title: "New Requirement",
-          name: data.name,
-          mobile: data.mobile,
-          message: data.requirement,
-          email: senderEmail,
-          reply_to: senderEmail,
-          to_email: recipientEmail,
-          sender_email: senderEmail,
-        },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
-
-      console.log("EmailJS response:", response);
-      reset();
-      setSuccess(true);
-      toast.success("Message sent!");
-      setTimeout(() => setSuccess(false), 2500);
-    } catch (error: any) {
-      console.error("EmailJS ERROR:", error);
-      if (error && error.status === 412) {
-        toast.error(
-          `Email service configuration issue: ${error.text || "please check your EmailJS dashboard"
-          }`
-        );
-      } else {
-        toast.error("Failed to send message. Check console for details.");
-      }
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as { message?: string };
+      if (!response.ok) throw new Error(result.message || "Unable to send your message.");
+      form.reset();
+      setMessage("");
+      setStatus({ kind: "success", message: result.message || "Thanks. Your request has been received." });
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message: error instanceof Error ? error.message : "Unable to send your message. Please try again.",
+      });
     } finally {
       setSending(false);
     }
-  };
+  }
 
   return (
-    <section
-      id="contact"
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        padding: "80px 5%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        color: "#fff",
-        overflow: "hidden",
-      }}
-    >
-      {/* Background Zoom */}
-      <motion.div
-        initial={{ scale: 1 }}
-        animate={shouldReduce ? {} : { scale: 1.05 }}
-        transition={{ duration: 25, repeat: Infinity, repeatType: "reverse" }}
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: "url('/images/contactbackground.png')", // fixed typo
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: -2,
-        }}
-      />
-
-      {/* Dark Overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "rgba(0,0,0,0.75)",
-          zIndex: -1,
-        }}
-      />
-
-      {/* Main Content */}
-      <motion.div
-        initial={shouldReduce ? {} : { opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-        style={{ width: "100%", maxWidth: "700px" }}
-      >
-        <h2 style={{ fontSize: "42px", marginBottom: "20px", fontWeight: 600 }}>
-          Contact Us
-        </h2>
-
-        {/* Accent Line */}
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: "80px" }}
-          transition={{ duration: 0.8 }}
-          style={{
-            height: "3px",
-            background: "#00ff88",
-            margin: "0 auto 40px",
-            borderRadius: "2px",
-          }}
-        />
-
-        {/* Social Links */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "3rem",
-            marginBottom: "40px",
-            flexWrap: "wrap",
-          }}
-        >
-          <a
-            href={`mailto:${email}?subject=Business Inquiry`}
-            style={socialLinkStyle("#00c3ff")}
-          >
-            <FaEnvelope /> Email
-          </a>
-          <a
-            href={linkedin}
-            target="_blank"
-            rel="noreferrer"
-            style={socialLinkStyle("#0a66c2")}
-          >
-            <FaLinkedin /> LinkedIn
-          </a>
-          <a
-            href={`https://wa.me/${whatsapp}?text=Hello%20Supekar%20Electronics`}
-            target="_blank"
-            rel="noreferrer"
-            style={socialLinkStyle("#00ff88")}
-          >
-            <FaWhatsapp /> WhatsApp
-          </a>
-          <a
-            href={insta}
-            target="_blank"
-            rel="noreferrer"
-            style={socialLinkStyle("#ff4dd2")}
-          >
-            <FaInstagram /> Instagram
-          </a>
+    <section id="contact" className="section contact-section">
+      <div className="section-inner contact-inner">
+        <div>
+          <p className="eyebrow">Let&apos;s work together</p>
+          <h2>Tell us what you&apos;re building</h2>
+          <p className="section-copy">Share your requirement and we&apos;ll get back to you.</p>
+          <div className="contact-actions" aria-label="Contact options">
+            <a className="button button-secondary" href={`tel:${siteContact.phone}`}>
+              <Phone size={18} aria-hidden="true" /> Call
+            </a>
+            <a className="button button-secondary" href={siteContact.whatsapp} target="_blank" rel="noreferrer">
+              <MessageCircle size={18} aria-hidden="true" /> WhatsApp
+            </a>
+            <a className="button button-secondary" href={`mailto:${siteContact.email}`}>
+              <Mail size={18} aria-hidden="true" /> Email
+            </a>
+          </div>
+          <div className="social-links">
+            <a href={siteContact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+              <FaInstagram size={20} />
+            </a>
+            <a href={siteContact.linkedIn} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <FaLinkedin size={20} />
+            </a>
+          </div>
         </div>
 
-        {/* Form */}
-        <motion.div
-          style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <input
-            {...register("name", { required: "Name is required" })}
-            type="text"
-            placeholder="Your Name"
-            style={inputStyle}
-          />
-          {errors.name && (
-            <span style={{ color: "#ff6b6b" }}>{errors.name.message}</span>
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <label>
+            Name
+            <input name="name" type="text" autoComplete="name" required minLength={2} maxLength={100} />
+          </label>
+          <label>
+            Phone
+            <input name="phone" type="tel" autoComplete="tel" required pattern="\+?(?:[0-9]| |\(|\)|-){10,20}" />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" autoComplete="email" required maxLength={254} />
+          </label>
+          <label>
+            Requirement type
+            <select name="requirementType" required defaultValue="">
+              <option value="" disabled>Select a service</option>
+              {services.map(({ title }) => <option key={title} value={title}>{title}</option>)}
+            </select>
+          </label>
+          <label>
+            Message
+            <textarea
+              name="message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              required
+              minLength={10}
+              maxLength={5000}
+              rows={5}
+            />
+          </label>
+          <label className="honeypot" aria-hidden="true">
+            Leave this field empty
+            <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+          </label>
+          <button className="button button-primary" type="submit" disabled={sending}>
+            {sending ? "Sending…" : "Send Requirement"}
+          </button>
+          {status && (
+            <p className={`form-status ${status.kind}`} role="status" aria-live="polite">
+              {status.message}
+            </p>
           )}
-
-          <input
-            {...register("mobile", {
-              required: "Mobile number required",
-              pattern: {
-                value: /^[0-9]{10,15}$/, // simple validation
-                message: "Invalid mobile number",
-              },
-            })}
-            type="tel"
-            placeholder="Mobile Number"
-            style={inputStyle}
-          />
-          {errors.mobile && (
-            <span style={{ color: "#ff6b6b" }}>{errors.mobile.message}</span>
-          )}
-
-          <textarea
-            {...register("requirement", { required: "Please specify your need" })}
-            placeholder="Enter your requirement..."
-            style={{ ...inputStyle, height: "140px", resize: "none" }}
-          />
-          {errors.requirement && (
-            <span style={{ color: "#ff6b6b" }}>
-              {errors.requirement.message}
-            </span>
-          )}
-
-          <motion.button
-            onClick={handleSubmit(sendEmail)}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 8px 20px rgba(0,255,136,0.35)",
-            }}
-            disabled={sending}
-            style={{
-              ...buttonStyle,
-              opacity: sending ? 0.6 : 1,
-              cursor: sending ? "not-allowed" : "pointer",
-            }}
-          >
-            {sending ? "Sending..." : "Send Requirement"}
-          </motion.button>
-        </motion.div>
-
-        {/* Success Animation */}
-        <AnimatePresence>
-          {success && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "#00ff88",
-                color: "#012",
-                padding: "18px 30px",
-                borderRadius: "12px",
-                fontWeight: 700,
-                fontSize: "18px",
-                zIndex: 100,
-              }}
-            >
-              ✅ Message Sent!
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {/* Toast container */}
-        <ToastContainer position="top-right" autoClose={3000} />
-      </motion.div>
+        </form>
+      </div>
     </section>
   );
 }
-

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const companyInfo = [
     ["Company Name", "Supekar Electronics"],
@@ -32,17 +33,22 @@ export default function CompanyInfoSection() {
                 alignItems: "center",
                 justifyContent: "center",
                 overflow: "hidden",
-                backgroundImage: "linear-gradient(rgba(2,6,23,0.78), rgba(2,6,23,0.82)), url('/images/product-bg.jpg')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
             }}
         >
+            <Image
+                src="/images/product-bg.jpg"
+                alt=""
+                fill
+                sizes="100vw"
+                aria-hidden="true"
+                style={{ objectFit: "cover", zIndex: 0 }}
+            />
             <div
                 style={{
                     position: "absolute",
                     inset: 0,
-                    background: "linear-gradient(145deg, rgba(2,6,23,0.35), rgba(15,23,42,0.72))",
                     zIndex: 0,
+                    background: "linear-gradient(rgba(2,6,23,0.78), rgba(2,6,23,0.82)), linear-gradient(145deg, rgba(2,6,23,0.35), rgba(15,23,42,0.72))",
                 }}
             />
 

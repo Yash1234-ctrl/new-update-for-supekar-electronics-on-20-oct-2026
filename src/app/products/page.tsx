@@ -1,79 +1,78 @@
+import Image from "next/image";
 import Link from "next/link";
-import { products } from "../../lib/products";
+import { products } from "../../data/products";
+
+const caseStudies = [
+  {
+    title: "Case Study Placeholder 1",
+    summary: "Placeholder project summary. Replace with an approved project description.",
+  },
+  {
+    title: "Case Study Placeholder 2",
+    summary: "Placeholder project summary. Replace with an approved project description.",
+  },
+];
 
 export default function ProductsPage() {
-    return (
-        <main
-            style={{
-                minHeight: "100vh",
-                background: "linear-gradient(135deg, #020617, #111827 45%, #172554)",
-                color: "#fff",
-                padding: "90px 5% 40px",
-            }}
-        >
-            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-                <Link href="/" style={{ color: "#7dd3fc", textDecoration: "none", fontWeight: 600, display: "inline-block", marginBottom: 16 }}>
-                    ← Back to Home
+  return (
+    <main className="products-page">
+      <section className="products-intro section">
+        <div className="section-inner">
+          <Link className="back-link" href="/">← Back to Home</Link>
+          <p className="eyebrow">Designed for practical applications</p>
+          <h1>Products</h1>
+          <p className="section-copy">
+            Explore our electronics, automation, and safety products. Contact us to discuss a product or project requirement.
+          </p>
+        </div>
+      </section>
+      <section className="section products-section">
+        <div className="section-inner">
+          <div className="card-grid three-column">
+            {products.map((product) => (
+              <article className="product-card" key={product.slug}>
+                <Link className="product-image" href={`/products/${product.slug}`} aria-label={`View ${product.name}`}>
+                  <Image
+                    src={product.image}
+                    alt={`${product.name} product`}
+                    fill
+                    sizes="(max-width: 700px) 100vw, (max-width: 1050px) 50vw, 33vw"
+                  />
                 </Link>
-                <h1 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: 8 }}>Our Product Range</h1>
-                <p style={{ color: "#dbeafe", maxWidth: 860, lineHeight: 1.7, marginBottom: 24 }}>
-                    Explore Supekar Electronics products built for automation, safety, and smart control across homes, industries, farms, and commercial spaces.
-                </p>
-
-                <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-                    {products.map((item, index) => (
-                        <article
-                            key={item.slug}
-                            style={{
-                                borderRadius: 24,
-                                overflow: "hidden",
-                                background: "rgba(15, 23, 42, 0.9)",
-                                border: "1px solid rgba(148,163,184,0.18)",
-                                boxShadow: "0 18px 35px rgba(15, 23, 42, 0.45)",
-                            }}
-                        >
-                            <div style={{ padding: 14 }}>
-                                <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    style={{
-                                        width: "100%",
-                                        height: 220,
-                                        objectFit: "cover",
-                                        borderRadius: 18,
-                                        border: "1px solid rgba(148,163,184,0.18)",
-                                        boxShadow: "0 18px 30px rgba(15, 23, 42, 0.35)",
-                                    }}
-                                />
-                            </div>
-                            <div style={{ padding: "0 16px 18px" }}>
-                                <p style={{ color: "#7dd3fc", textTransform: "uppercase", letterSpacing: "0.18em", fontSize: 12, marginBottom: 6 }}>
-                                    Product {index + 1}
-                                </p>
-                                <h2 style={{ fontSize: 20, marginBottom: 8 }}>{item.title}</h2>
-                                <p style={{ color: "#e2e8f0", lineHeight: 1.6, fontSize: 14, marginBottom: 12 }}>{item.shortDescription}</p>
-                                <Link
-                                    href={`/products/${item.slug}`}
-                                    style={{
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        padding: "10px 14px",
-                                        borderRadius: 10,
-                                        background: "linear-gradient(135deg, #22d3ee, #2563eb)",
-                                        color: "#fff",
-                                        textDecoration: "none",
-                                        fontWeight: 700,
-                                        boxShadow: "0 10px 16px rgba(56, 189, 248, 0.28)",
-                                    }}
-                                >
-                                    See Full Details
-                                </Link>
-                            </div>
-                        </article>
-                    ))}
+                <div className="product-card-content">
+                  <h2><Link href={`/products/${product.slug}`}>{product.name}</Link></h2>
+                  <p>{product.shortDescription}</p>
+                  <h3>Key specs</h3>
+                  <ul>{product.keySpecs.map((spec) => <li key={spec}>{spec}</li>)}</ul>
+                  <h3>Use cases</h3>
+                  <ul>{product.useCases.map((useCase) => <li key={useCase}>{useCase}</li>)}</ul>
+                  <Link
+                    className="button button-primary"
+                    href={`/?product=${encodeURIComponent(product.name)}#contact`}
+                  >
+                    Request Quote
+                  </Link>
                 </div>
-            </div>
-        </main>
-    );
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="section section-alt">
+        <div className="section-inner">
+          <p className="eyebrow">Selected work</p>
+          <h2>Projects / Case Studies</h2>
+          <div className="card-grid two-column">
+            {caseStudies.map((study) => (
+              <article className="info-card" key={study.title}>
+                <p className="placeholder-label">Placeholder — replace before publishing</p>
+                <h3>{study.title}</h3>
+                <p>{study.summary}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }

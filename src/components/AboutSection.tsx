@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function AboutSection() {
   return (
@@ -13,9 +14,10 @@ export default function AboutSection() {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
+        isolation: "isolate",
       }}
     >
-      {/* 🔥 Background Parallax Layer */}
+      {/* Decorative background image. */}
       <motion.div
         initial={{ scale: 1.2 }}
         whileInView={{ scale: 1 }}
@@ -24,12 +26,18 @@ export default function AboutSection() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "url('/images/about-bg.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
           zIndex: -2,
         }}
-      />
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/about-bg.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center" }}
+        />
+      </motion.div>
 
       {/* 🌑 Dark Gradient Overlay */}
       <div

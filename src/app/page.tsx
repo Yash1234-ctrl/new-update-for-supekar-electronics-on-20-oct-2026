@@ -1,8 +1,7 @@
 import HeroSection from "../components/HeroSection";
 import AboutSection from "../components/AboutSection";
 import CompanyInfoSection from "../components/CompanyInfoSection";
-
-import FounderSection from "../components/FounderSection";
+import HomeSections from "../components/HomeSections";
 import ContactSection from "../components/ContactSection";
 
 export default function Home() {
@@ -10,9 +9,8 @@ export default function Home() {
     <>
       <HeroSection />
       <AboutSection />
+      <HomeSections />
       <CompanyInfoSection />
-
-      <FounderSection />
       <ContactSection />
     </>
   );

@@ -8,7 +8,7 @@ This document tracks all production-ready improvements made to your Next.js appl
 - [x] Moved Firebase config to `NEXT_PUBLIC_FIREBASE_*` environment variables
 - [x] Moved EmailJS credentials to `NEXT_PUBLIC_EMAILJS_*` environment variables
 - [x] Moved contact info (email, WhatsApp, Instagram) to `NEXT_PUBLIC_CONTACT_*` variables
-- [x] Created `.env.local.example` with all required keys
+- [x] Created `.env.example` with all required keys (private-key value intentionally blank)
 - [x] Ensured `.env.local` is in `.gitignore` and will not be committed
 - [x] Added guards for missing Firebase config (returns null during SSR)
 
@@ -65,7 +65,7 @@ This document tracks all production-ready improvements made to your Next.js appl
   - Step-by-step Vercel deployment guide
   - Testing instructions
   - Email service troubleshooting notes
-- [x] Created `.env.local.example` template for developers
+- [x] Created `.env.example` template for developers
 - [x] Added notes on running from correct folder (`cd supekar-electronics`)
 
 ---
@@ -74,7 +74,7 @@ This document tracks all production-ready improvements made to your Next.js appl
 
 1. **In your local repo:**
    ```bash
-   cp .env.local.example .env.local
+   cp .env.example .env.local
    ```
    Fill in your actual Firebase and EmailJS credentials in `.env.local`.
 
@@ -124,6 +124,7 @@ This document tracks all production-ready improvements made to your Next.js appl
      NEXT_PUBLIC_EMAILJS_SERVICE_ID = ...
      NEXT_PUBLIC_EMAILJS_TEMPLATE_ID = ...
      NEXT_PUBLIC_EMAILJS_PUBLIC_KEY = ...
+     EMAILJS_PRIVATE_KEY = ... (server-side only; required for EmailJS strict mode)
      
      NEXT_PUBLIC_CONTACT_EMAIL = ...
      NEXT_PUBLIC_WHATSAPP_NUMBER = ...

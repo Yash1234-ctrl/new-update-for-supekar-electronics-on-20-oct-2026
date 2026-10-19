@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-Before starting, copy `.env.local.example` to `.env.local` and fill in the
+Before starting, copy `.env.example` to `.env.local` and fill in the
 credentials for Firebase and EmailJS. Do **not** commit `.env.local` to version
 control – it is ignored by `.gitignore`.
 
@@ -32,11 +32,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ### Environment variables
 
-Several services require API keys and identifiers. See `.env.local.example` for a
+Several services require API keys and identifiers. See `.env.example` for a
 list of values used by the application. At a minimum you will need:
 
 - Firebase project configuration (all `NEXT_PUBLIC_FIREBASE_*` values)
 - EmailJS service ID, template ID, and public key (`NEXT_PUBLIC_EMAILJS_*`)
+- EmailJS private key (`EMAILJS_PRIVATE_KEY`, server-side only; required when
+  EmailJS strict mode is enabled)
 - (Optional) `NEXT_PUBLIC_CONTACT_*` values can be overridden here.
 
 Additional back-end variables such as `MONGODB_URI` are used by the
@@ -53,6 +55,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 2. **Add environment variables** to your Vercel project settings. Go to **Project Settings > Environment Variables** and add:
    - All `NEXT_PUBLIC_FIREBASE_*` variables from your Firebase console
    - All `NEXT_PUBLIC_EMAILJS_*` variables from EmailJS
+   - `EMAILJS_PRIVATE_KEY` (server-side only; required for EmailJS strict mode)
    - `NEXT_PUBLIC_CONTACT_*` variables (email, WhatsApp, Instagram)
    - `NEXT_PUBLIC_SENTRY_DSN` (optional, for error tracking via Sentry)
 3. **Deploy** – Vercel will automatically detect Next.js and run `npm run build` and `npm start`.
@@ -63,7 +66,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Email service configuration
 
-The contact form uses [EmailJS](https://www.emailjs.com/) with a Gmail integration.
+The contact form sends validated submissions to [EmailJS](https://www.emailjs.com/)
+through the `/api/contact` route. Its template should use the `name`, `phone`,
+`email`, `requirementType`, and `message` template parameters.
 If you see errors such as `Gmail_API: Invalid grant. Please reconnect your Gmail account`
 (or HTTP 412 responses) when attempting to send a message, log into the
 EmailJS dashboard and reconnect or re‑authorize the Gmail service. Credentials
